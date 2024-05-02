@@ -41,8 +41,8 @@ jobs:
         run: dotnet restore Fracs.Wasm/Fracs.Wasm.csproj
       - name: Build & publish project
         run: dotnet publish Fracs.Wasm/Fracs.Wasm.csproj -c Release --output release --nologo
-      - name: Adjust base-tag in index.html from / to /fracs/ so it works in github pages
-        run: sed -i 's/<base href="\/" \/>/<base href="\/fracs\/" \/>/g' release/wwwroot/index.html
+      - name: Adjust base-tag in index.html from / to /blazor-fracs/ so it works in github pages
+        run: sed -i 's/<base href="\/" \/>/<base href="\/blazor-fracs\/" \/>/g' release/wwwroot/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
