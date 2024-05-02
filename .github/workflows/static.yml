@@ -38,9 +38,9 @@ jobs:
       - name: Install wasm-tools
         run: dotnet workload install wasm-tools
       - name: Restore dependencies
-        run: dotnet restore src/Fracs.Wasm/Fracs.Wasm.csproj
+        run: dotnet restore Fracs.Wasm/Fracs.Wasm.csproj
       - name: Build & publish project
-        run: dotnet publish src/Fracs.Wasm/Fracs.Wasm.csproj -c Release --output release --nologo
+        run: dotnet publish Fracs.Wasm/Fracs.Wasm.csproj -c Release --output release --nologo
       - name: Adjust base-tag in index.html from / to /fracs/ so it works in github pages
         run: sed -i 's/<base href="\/" \/>/<base href="\/fracs\/" \/>/g' release/wwwroot/index.html
       - name: Setup Pages
