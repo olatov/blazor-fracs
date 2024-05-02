@@ -1,0 +1,365 @@
+﻿@page "/"
+@using System.Text
+
+<PageTitle>Home</PageTitle>
+
+<div class="container">
+    <h1 class="display-5">Сложение обыкновенных дробей</h1>
+
+    <div class="container d-flex">
+        <EditForm Model="@value1" class="form-group m-4">
+            <h2 class="display-6">1-е слагаемое</h2>
+            <div class="form-group">
+                <label>
+                    Целая часть
+                    <InputNumber class="form-control" @bind-Value="@value1.Whole" />
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    Числитель
+                    <InputNumber class="form-control" @bind-Value="@value1.Numerator" />
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    Знаменатель
+                    <InputNumber class="form-control" min="1" @bind-Value="@value1.Denominator" />
+                </label>
+            </div>
+        </EditForm>
+
+        <EditForm Model="@value2" class="form-group m-4">
+            <h2 class="display-6">2-е слагаемое</h2>
+            <div class="form-group">
+                <label>
+                    Целая часть
+                    <InputNumber class="form-control" @bind-Value="@value2.Whole" />
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    Числитель
+                    <InputNumber class="form-control" type="number" @bind-Value="@value2.Numerator" />
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    Знаменатель
+                    <InputNumber class="form-control" type="number" min="1" @bind-Value="@value2.Denominator" />
+                </label>
+            </div>
+        </EditForm>
+
+        <div class="m-4">
+            <button type="button" class="btn btn-primary" @onclick="@OkClick">Сложить</button>
+        </div>
+    </div>
+
+    <div style="font-size: 24px">
+        <Equation Value="@Formula.ToString()" />
+    </div>
+</div>
+
+@code {
+    record Fraction
+    {
+        public int Whole { get; set; }
+
+        public int Numerator { get; set; }
+
+        public int Denominator { get; set; }
+    }
+
+    class FractionForm
+    {
+        public int Whole { get; set; }
+
+        public int Numerator { get; set; }
+
+        public int Denominator { get; set; }
+
+        public Fraction ToFraction() =>
+            new Fraction
+                {
+                    Whole = Whole,
+                    Numerator = Numerator,
+                    Denominator = Denominator,
+                };
+    }
+
+
+    FractionForm value1 = new FractionForm { Whole = 0, Numerator = 2, Denominator = 3 };
+
+    FractionForm value2 = new FractionForm { Whole = 0, Numerator = 7, Denominator = 9 };
+
+    string Formula = string.Empty;
+
+    void OkClick()
+    {
+        Formula = PerformAddition(value1.ToFraction(), value2.ToFraction());
+    }
+
+    static int CalculateLCM(int a, int b)
+    {
+        return (a * b) / CalculateGCD(a, b);
+    }
+
+    static int CalculateGCD(int a, int b)
+    {
+        while (b != 0)
+        {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    string PerformAddition(Fraction a, Fraction b)
+    {
+        var result = new StringBuilder();
+
+        if (a.Whole != 0 || a.Numerator == 0)
+        {
+            result.Append(a.Whole);
+        }
+        if (a.Numerator != 0)
+        {
+            result.Append(@$"\frac{{{a.Numerator}}}{{{a.Denominator}}}");
+        }
+
+        result.Append("+");
+
+        if (b.Whole < 0)
+        {
+            result.Append(@"\left(")
+                .Append(b.Whole);
+
+            if (b.Numerator != 0)
+            {
+                result.Append(@$"\frac{{{b.Numerator}}}{{{b.Denominator}}}");
+            }
+
+            result.Append(@"\right)");
+        }
+        else
+        {
+            if (b.Whole != 0 || b.Numerator == 0)
+            {
+                result.Append(b.Whole);
+            }
+
+            if (b.Numerator != 0)
+            {
+                result.Append(@$"\frac{{{b.Numerator}}}{{{b.Denominator}}}");
+            }
+        }
+
+        bool isSimplified = false;
+        int commonDivisor;
+
+        if (Math.Abs(a.Numerator) != 0)
+        {
+            commonDivisor = CalculateGCD(Math.Abs(a.Numerator), a.Denominator);
+            if (commonDivisor > 1)
+            {
+                a.Numerator /= commonDivisor;
+                a.Denominator /= commonDivisor;
+                isSimplified = true;
+            }
+        }
+
+        if (Math.Abs(b.Numerator) != 0)
+        {
+            commonDivisor = CalculateGCD(Math.Abs(b.Numerator), b.Denominator);
+            if (commonDivisor > 1)
+            {
+                b.Numerator /= commonDivisor;
+                b.Denominator /= commonDivisor;
+                isSimplified = true;
+            }
+        }
+
+        if (isSimplified)
+        {
+            result.Append("=");
+
+            if (a.Whole != 0 || a.Numerator == 0)
+            {
+                result.Append(a.Whole);
+            }
+            if (a.Numerator != 0)
+            {
+                result.Append(@$"\frac{{{a.Numerator}}}{{{a.Denominator}}}");
+            }
+
+            result.Append("+");
+
+            if (b.Whole < 0)
+            {
+                result.Append(@"\left(")
+                    .Append(b.Whole);
+
+                if (b.Numerator != 0)
+                {
+                    result.Append(@$"\frac{{{b.Numerator}}}{{{b.Denominator}}}");
+                }
+
+                result.Append(@"\right)");
+            }
+            else
+            {
+                if (b.Whole != 0 || b.Numerator == 0)
+                {
+                    result.Append(b.Whole);
+                }
+
+                if (b.Numerator != 0)
+                {
+                    result.Append(@$"\frac{{{b.Numerator}}}{{{b.Denominator}}}");
+                }
+            }
+        }
+
+        var c = new Fraction();
+
+        if ((a.Numerator == 0) && (b.Numerator == 0))
+        {
+            c.Whole = a.Whole + b.Whole;
+            c.Numerator = 0;
+            c.Denominator = 1;
+        }
+        else
+        {
+            if (a.Numerator == 0)
+            {
+                a.Denominator = b.Denominator;
+            }
+            else if (b.Numerator == 0)
+            {
+                b.Denominator = a.Denominator;
+            }
+
+            if ((a.Whole != 0) || (b.Whole != 0))
+            {
+                if (a.Whole != 0)
+                {
+                    a.Numerator = (a.Whole > 0)
+                        ? (a.Whole * a.Denominator) + a.Numerator
+                        : (a.Whole * a.Denominator) - a.Numerator;
+                    a.Whole = 0;
+                }
+
+                if (b.Whole != 0)
+                {
+                    b.Numerator = (b.Whole > 0)
+                        ? (b.Whole * b.Denominator) + b.Numerator
+                        : (b.Whole * b.Denominator) - b.Numerator;
+
+                    b.Whole = 0;
+                }
+
+                result.Append("=")
+                    .Append(@$"\frac{{{a.Numerator}}}{{{a.Denominator}}}")
+                    .Append(@$"+\frac{{{b.Numerator}}}{{{b.Denominator}}}");
+            }
+
+
+            int mula;
+            int mulb;
+            int commonDenominator;
+
+            if (a.Denominator == b.Denominator)
+            {
+                mula = 1;
+                mulb = 1;
+                commonDenominator = a.Denominator;
+            }
+            else
+            {
+                commonDenominator = CalculateLCM(a.Denominator, b.Denominator);
+                mula = commonDenominator / a.Denominator;
+                mulb = commonDenominator / b.Denominator;
+
+                result.Append("=")
+                    .Append(@"\frac{(")
+                    .Append(a.Numerator >= 0 ? $"{a.Numerator}" : $"({a.Numerator})")
+                    .Append(@"\cdot")
+                    .Append(mula)
+                    .Append(")+(")
+                    .Append(b.Numerator >= 0 ? $"{b.Numerator}" : $"({b.Numerator})")
+                    .Append(@$"\cdot")
+                    .Append(mulb)
+                    .Append(")}")
+                    .Append("{")
+                    .Append(commonDenominator.ToString())
+                    .Append("}");
+            }
+
+            result.Append("=")
+                .Append(@"\frac{")
+                .Append(a.Numerator * mula)
+                .Append(b.Numerator >= 0 ? "+" : "-")
+                .Append(Math.Abs(b.Numerator * mulb))
+                .Append("}")
+                .Append("{")
+                .Append(commonDenominator.ToString())
+                .Append("}");
+
+            c.Whole = 0;
+            c.Numerator = (a.Numerator * mula) + (b.Numerator * mulb);
+            c.Denominator = commonDenominator;
+
+            result.Append("=")
+                .Append(@"\frac")
+                .Append($"{{{c.Numerator}}}{{{c.Denominator}}}");
+        }
+
+        if (c.Numerator != 0)
+        {
+            commonDivisor = CalculateGCD(Math.Abs(c.Numerator), c.Denominator);
+            if (commonDivisor > 1)
+            {
+                c.Numerator /= commonDivisor;
+                c.Denominator /= commonDivisor;
+
+                if (c.Denominator != 1)
+                {
+                    result.Append("=")
+                       .Append(@"\frac")
+                       .Append($"{{{c.Numerator}}}{{{c.Denominator}}}");
+                }
+            }
+
+            if (c.Numerator < 0)
+            {
+                result.Append("=")
+                    .Append("-")
+                    .Append(@"\frac")
+                    .Append($"{{{Math.Abs(c.Numerator)}}}{{{c.Denominator}}}");
+            }
+
+            c.Whole = c.Numerator / c.Denominator;
+            c.Numerator = c.Numerator % c.Denominator;
+            if (c.Whole < 0)
+            {
+                c.Numerator = Math.Abs(c.Numerator);
+            }
+        }
+
+        if (c.Whole != 0 || c.Numerator == 0)
+        {
+            result.Append("=");
+            result.Append(c.Whole);
+
+            if (c.Numerator != 0)
+            {
+                result.Append(@"\frac")
+                    .Append($"{{{c.Numerator}}}{{{c.Denominator}}}");
+            }
+        }
+
+        return result.ToString();
+    }
+}

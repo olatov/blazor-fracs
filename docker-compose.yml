@@ -1,0 +1,18 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+services:
+  fracs:
+    image: fracs
+    build:
+      context: .
+      dockerfile: Fracs/Dockerfile
+    ports:
+      - 5010:5010
+
+  fracs-wasm:
+    image: fracs-wasm
+    build:
+      context: .
+      dockerfile: Fracs.Wasm/Dockerfile
+    ports:
+      - 5011:80
